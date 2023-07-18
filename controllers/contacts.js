@@ -1,14 +1,10 @@
-const Joi = require("joi");
+
 
 const { HttpError, ctrlWrapper } = require("../helpers");
 
 const contacts = require("../models/contacts");
+const addShema = require('../models/contact')
 
-const addShema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
-});
 
 const getById = async (req, res) => {
   const { id } = req.params;
