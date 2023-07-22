@@ -66,17 +66,16 @@ const logout = async (req, res) => {
   });
 };
 
-const subscription  = async (req, res) => {
+const subscription = async (req, res) => {
   const { _id } = req.user;
   const result = await User.findByIdAndUpdate(_id, req.body, { new: true });
   res.json(result);
 };
-
 
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  subscription: ctrlWrapper( subscription),
+  subscription: ctrlWrapper(subscription),
 };
