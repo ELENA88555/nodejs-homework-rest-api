@@ -1,15 +1,18 @@
 const { HttpError, ctrlWrapper } = require("../helpers");
-// HttpError, 
-const {Contact} = require("../models/contact");
+
+const { Contact } = require("../models/contact");
 const { schemas } = require("../models/contact");
 
 const getAll = async (req, res) => {
-  const result = await Contact.find();
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  const result = await Contact.find({ owner }, "-createAt -updateAt", {
+    skip,
+    limit,
+  }).populate("owner", "email");
   res.json(result);
 };
-
-// {}, "-createdAt -updatedAt"
-
 
 const getById = async (req, res) => {
   const { id } = req.params;
@@ -21,12 +24,8 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res, next) => {
-  const { error } = schemas.addSchema.validate(req.body);
-
-  if (error) {
-    throw HttpError(400, "missing required name field");
-  }
-  const result = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 
@@ -45,7 +44,7 @@ const updateById = async (req, res, next) => {
     throw HttpError(400, error.message);
   }
   const { id } = req.params;
-  const result = await Contact.findByIdAndUpdate(id, req.body, { new: true, });
+  const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
 
   if (!result) {
     throw HttpError(404, "Not found");
